@@ -11,6 +11,10 @@
 *.o
 *.obj
 
+#idk
+*.exe.recipe
+*.FileListAbsolute.txt
+
 # Precompiled Headers
 *.gch
 *.pch
@@ -95,6 +99,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+intermediates/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/

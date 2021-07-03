@@ -5,8 +5,8 @@
 class Memory
 {
 private:
-	DWORD id = 0; // id of process
-	HANDLE process = NULL; // handle to process
+	DWORD id = 0;
+	HANDLE process = NULL;
 
 public:
 	Memory(const char* processName);
