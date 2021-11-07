@@ -6,14 +6,14 @@ class Memory
 {
 private:
 	DWORD id = 0;
-	HANDLE process = NULL;
+	HANDLE process = nullptr;
 
 public:
 	Memory(const char* processName);
 	~Memory();
 
-	DWORD GetProcessId();
-	HANDLE GetProcessHandle();
+	constexpr DWORD GetProcessId() { return id; }
+	constexpr HANDLE GetProcessHandle() { return process; }
 
 	uintptr_t GetModuleAddress(const char* moduleName);
 

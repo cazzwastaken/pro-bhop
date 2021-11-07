@@ -28,16 +28,6 @@ Memory::~Memory()
 		CloseHandle(this->process);
 }
 
-DWORD Memory::GetProcessId()
-{
-	return this->id;
-}
-
-HANDLE Memory::GetProcessHandle()
-{
-	return this->process;
-}
-
 uintptr_t Memory::GetModuleAddress(const char* moduleName)
 {
 	MODULEENTRY32 entry;
