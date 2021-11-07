@@ -51,8 +51,8 @@ int main()
 			mem.Write<float>(glowObjectManager + (glowIndex * 0x38) + 0x10, 0.f);
 			mem.Write<float>(glowObjectManager + (glowIndex * 0x38) + 0x14, 1.f);
 
+			mem.Write<bool>(glowObjectManager + (glowIndex * 0x38) + 0x27, true);
 			mem.Write<bool>(glowObjectManager + (glowIndex * 0x38) + 0x28, true);
-			mem.Write<bool>(glowObjectManager + (glowIndex * 0x38) + 0x29, true);
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
