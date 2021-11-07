@@ -3,9 +3,9 @@
 
 namespace offsets
 {
-	constexpr auto localPlayer = 0xD892CC;
+	constexpr auto localPlayer = 0xDA544C;
 	constexpr auto flags = 0x104;
-	constexpr auto forceJump = 0x524BF4C;
+	constexpr auto forceJump = 0x5269570;
 }
 
 int main()
@@ -19,15 +19,11 @@ int main()
 
 	while (true)
 	{
-		const auto localPlayer = mem.Read<uintptr_t>(client + offsets::localPlayer);
+		const auto localPlayer = mem.Read<std::uintptr_t>(client + offsets::localPlayer);
+		const auto flags = mem.Read<std::uintptr_t>(localPlayer + offsets::flags);
 
-		if (localPlayer)
-		{
-			const auto onGround = mem.Read<bool>(localPlayer + offsets::flags);
-
-			if (GetAsyncKeyState(VK_SPACE) && onGround & (1 << 0))
-				mem.Write<BYTE>(client + offsets::forceJump, 6);
-		}
+		if (GetAsyncKeyState(VK_SPACE))
+			(flags & (1 << 0)) ? mem.Write<std::uintptr_t>(client + offsets::forceJump, 6) : mem.Write<std::uintptr_t>(client + offsets::forceJump, 4);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 	}
