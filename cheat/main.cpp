@@ -12,14 +12,26 @@ namespace offsets
 	constexpr auto glowIndex = 0x10488;
 }
 
+__declspec(align(16)) struct Color
+{
+	float r, g, b, a;
+};
+
 int main()
 {
 	auto mem = Memory("csgo.exe");
 
-	std::cout << "Process id: " << mem.GetProcessId() << std::endl;
+	std::cout << "Process id: " << mem.ProcessId() << std::endl;
 
 	const auto client = mem.GetModuleAddress("client.dll");
 	std::cout << "client.dll -> " << "0x" << std::hex << client << std::dec << std::endl;
+
+	auto color = Color{ };
+	color.r = 1.f;
+	color.g = 0.f;
+	color.b = 0.f;
+	color.a = 1.f;
+
 
 	while (true)
 	{
@@ -33,12 +45,12 @@ int main()
 		// glow
 		const auto glowObjectManager = mem.Read<std::uintptr_t>(client + offsets::glowObjectManager);
 
-		for (auto i = 0; i < 64; ++i)
+		for (auto i = 0; i < 32; ++i)
 		{
 			const auto entity = mem.Read<std::uintptr_t>(client + offsets::entityList + i * 0x10);
 
-			if (!entity)
-				continue;
+			//if (!entity)
+				//continue;
 
 			// dont glow if they are on our team
 			if (mem.Read<std::uintptr_t>(entity + offsets::team) == mem.Read<std::uintptr_t>(localPlayer + offsets::team))
@@ -46,10 +58,15 @@ int main()
 
 			const auto glowIndex = mem.Read<std::int32_t>(entity + offsets::glowIndex);
 
-			mem.Write<float>(glowObjectManager + (glowIndex * 0x38) + 0x8, 1.f);
-			mem.Write<float>(glowObjectManager + (glowIndex * 0x38) + 0xC, 0.f);
-			mem.Write<float>(glowObjectManager + (glowIndex * 0x38) + 0x10, 0.f);
-			mem.Write<float>(glowObjectManager + (glowIndex * 0x38) + 0x14, 1.f);
+			//mem.Write<float>(glowObjectManager + (glowIndex * 0x38) + 0x8, 1.f);
+			//mem.Write<float>(glowObjectManager + (glowIndex * 0x38) + 0xC, 0.f);
+			//mem.Write<float>(glowObjectManager + (glowIndex * 0x38) + 0x10, 0.f);
+			//mem.Write<float>(glowObjectManager + (glowIndex * 0x38) + 0x14, 1.f);
+
+			//mem.Write<bool>(glowObjectManager + (glowIndex * 0x38) + 0x27, true);
+			//mem.Write<bool>(glowObjectManager + (glowIndex * 0x38) + 0x28, true);
+
+			mem.Write<Color>(glowObjectManager + (glowIndex * 0x38) + 0x8, color);
 
 			mem.Write<bool>(glowObjectManager + (glowIndex * 0x38) + 0x27, true);
 			mem.Write<bool>(glowObjectManager + (glowIndex * 0x38) + 0x28, true);

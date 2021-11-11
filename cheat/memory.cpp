@@ -28,20 +28,20 @@ Memory::~Memory()
 		CloseHandle(this->process);
 }
 
-uintptr_t Memory::GetModuleAddress(const char* moduleName)
+std::uintptr_t Memory::GetModuleAddress(const char* moduleName)
 {
 	MODULEENTRY32 entry;
 	entry.dwSize = sizeof(MODULEENTRY32);
 
 	const auto snapShot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, this->id);
 
-	uintptr_t result = 0;
+	std::uintptr_t result = 0;
 
 	while (Module32Next(snapShot, &entry))
 	{
 		if (!strcmp(moduleName, entry.szModule))
 		{
-			result = reinterpret_cast<uintptr_t>(entry.modBaseAddr);
+			result = reinterpret_cast<std::uintptr_t>(entry.modBaseAddr);
 			break;
 		}
 	}

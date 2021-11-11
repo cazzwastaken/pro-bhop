@@ -5,29 +5,28 @@
 class Memory
 {
 private:
-	DWORD id = 0;
+	std::uintptr_t id = 0;
 	HANDLE process = nullptr;
 
 public:
 	Memory(const char* processName);
 	~Memory();
 
-	constexpr DWORD GetProcessId() { return id; }
-	constexpr HANDLE GetProcessHandle() { return process; }
+	constexpr std::uintptr_t ProcessId() { return this->id; }
 
-	uintptr_t GetModuleAddress(const char* moduleName);
+	std::uintptr_t GetModuleAddress(const char* moduleName);
 
 	template <typename T>
-	T Read(uintptr_t address)
+	constexpr T Read(std::uintptr_t address) const noexcept
 	{
-		T value;
-		ReadProcessMemory(this->process, (LPCVOID)address, &value, sizeof(T), NULL);
+		T value{ };
+		ReadProcessMemory(this->process, reinterpret_cast<LPCVOID>(address), &value, sizeof(T), NULL);
 		return value;
 	}
 
 	template <typename T>
-	bool Write(uintptr_t address, T value)
+	constexpr const bool Write(std::uintptr_t address, T value) const noexcept
 	{
-		return WriteProcessMemory(this->process, (LPVOID)address, &value, sizeof(T), NULL);
+		return WriteProcessMemory(this->process, reinterpret_cast<LPVOID>(address), &value, sizeof(T), NULL);
 	}
 };
