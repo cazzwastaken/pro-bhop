@@ -1,13 +1,16 @@
 #include "memory.h"
-#include <thread>
 
+#include <thread>
+#include <iostream>
+
+// https://github.com/frk1/hazedumper/blob/master/csgo.hpp
 namespace offsets
 {
-	constexpr auto localPlayer = 0xDA544C;
+	constexpr auto localPlayer = 0xDA747C;
 	constexpr auto flags = 0x104;
-	constexpr auto forceJump = 0x5269570;
-	constexpr auto entityList = 0x4DBF75C;
-	constexpr auto glowObjectManager = 0x5307C48;
+	constexpr auto forceJump = 0x526B590;
+	constexpr auto entityList = 0x4DC177C;
+	constexpr auto glowObjectManager = 0x5309C78;
 	constexpr auto team = 0xF4;
 	constexpr auto glowIndex = 0x10488;
 }
@@ -21,7 +24,7 @@ int main()
 {
 	auto mem = Memory("csgo.exe");
 
-	std::cout << "Process id: " << mem.ProcessId() << std::endl;
+	std::cout << "csgo found!" << std::endl;
 
 	const auto client = mem.GetModuleAddress("client.dll");
 	std::cout << "client.dll -> " << "0x" << std::hex << client << std::dec << std::endl;
@@ -45,7 +48,7 @@ int main()
 		// glow
 		const auto glowObjectManager = mem.Read<std::uintptr_t>(client + offsets::glowObjectManager);
 
-		for (auto i = 0; i < 32; ++i)
+		for (auto i = 0; i < 64; ++i)
 		{
 			const auto entity = mem.Read<std::uintptr_t>(client + offsets::entityList + i * 0x10);
 

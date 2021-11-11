@@ -146,7 +146,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cheat\main.cpp" />
-    <ClCompile Include="cheat\memory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cheat\memory.h" />
