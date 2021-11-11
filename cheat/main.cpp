@@ -17,6 +17,9 @@ namespace offsets
 
 __declspec(align(16)) struct Color
 {
+	constexpr Color(const float r, const float g, const float b, const float a = 1.f) noexcept :
+		r(r), g(g), b(b), a(a) { }
+
 	float r, g, b, a;
 };
 
@@ -29,12 +32,7 @@ int main()
 	const auto client = mem.GetModuleAddress("client.dll");
 	std::cout << "client.dll -> " << "0x" << std::hex << client << std::dec << std::endl;
 
-	auto color = Color{ };
-	color.r = 1.f;
-	color.g = 0.f;
-	color.b = 0.f;
-	color.a = 1.f;
-
+	const auto color = Color{ 1.f, 0.f, 0.f };
 
 	while (true)
 	{
@@ -75,6 +73,6 @@ int main()
 			mem.Write<bool>(glowObjectManager + (glowIndex * 0x38) + 0x28, true);
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		std::this_thread::sleep_for(std::chrono::milliseconds(2));
 	}
 }
