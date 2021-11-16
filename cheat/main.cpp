@@ -11,7 +11,7 @@ namespace offsets
 	constexpr auto forceJump = 0x526B590;
 	constexpr auto entityList = 0x4DC177C;
 	constexpr auto glowObjectManager = 0x5309C78;
-	constexpr auto team = 0xF4;
+	constexpr auto teamNum = 0xF4;
 	constexpr auto glowIndex = 0x10488;
 }
 
@@ -25,36 +25,37 @@ __declspec(align(16)) struct Color
 
 int main()
 {
-	auto mem = Memory("csgo.exe");
+	const auto mem = Memory("csgo.exe");
 
 	std::cout << "csgo found!" << std::endl;
 
 	const auto client = mem.GetModuleAddress("client.dll");
 	std::cout << "client.dll -> " << "0x" << std::hex << client << std::dec << std::endl;
 
-	const auto color = Color{ 1.f, 0.f, 0.f };
+	constexpr const auto color = Color{ 1.f, 0.f, 1.f };
 
 	while (true)
 	{
 		const auto localPlayer = mem.Read<std::uintptr_t>(client + offsets::localPlayer);
-		const auto flags = mem.Read<std::uintptr_t>(localPlayer + offsets::flags);
+
+		const auto localPlayerTeam = mem.Read<std::uintptr_t>(localPlayer + offsets::teamNum);
+		const auto localPlayerFlags = mem.Read<std::uintptr_t>(localPlayer + offsets::flags);
 
 		// bhop
 		if (GetAsyncKeyState(VK_SPACE))
-			(flags & (1 << 0)) ? mem.Write<std::uintptr_t>(client + offsets::forceJump, 6) : mem.Write<std::uintptr_t>(client + offsets::forceJump, 4);
+			(localPlayerFlags & (1 << 0)) ?
+			mem.Write<std::uintptr_t>(client + offsets::forceJump, 6) :
+			mem.Write<std::uintptr_t>(client + offsets::forceJump, 4);
 
 		// glow
 		const auto glowObjectManager = mem.Read<std::uintptr_t>(client + offsets::glowObjectManager);
 
-		for (auto i = 0; i < 64; ++i)
+		for (auto i = 1; i <= 64; ++i)
 		{
 			const auto entity = mem.Read<std::uintptr_t>(client + offsets::entityList + i * 0x10);
 
-			//if (!entity)
-				//continue;
-
 			// dont glow if they are on our team
-			if (mem.Read<std::uintptr_t>(entity + offsets::team) == mem.Read<std::uintptr_t>(localPlayer + offsets::team))
+			if (mem.Read<std::uintptr_t>(entity + offsets::teamNum) == localPlayerTeam)
 				continue;
 
 			const auto glowIndex = mem.Read<std::int32_t>(entity + offsets::glowIndex);
@@ -73,6 +74,6 @@ int main()
 			mem.Write<bool>(glowObjectManager + (glowIndex * 0x38) + 0x28, true);
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(2));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 }
