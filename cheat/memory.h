@@ -15,7 +15,7 @@ private:
 public:
 	// Constructor that finds the process id
 	// and opens a handle
-	Memory(const std::string_view processName)
+	Memory(const std::string_view processName) noexcept
 	{
 		::PROCESSENTRY32 entry = { };
 		entry.dwSize = sizeof(::PROCESSENTRY32);
@@ -39,7 +39,7 @@ public:
 	~Memory() { if (processHandle) ::CloseHandle(processHandle); }
 
 	// Returns the base address of a module by name
-	const std::uintptr_t GetModuleAddress(const std::string_view moduleName)
+	const std::uintptr_t GetModuleAddress(const std::string_view moduleName) const noexcept
 	{
 		::MODULEENTRY32 entry = { };
 		entry.dwSize = sizeof(::MODULEENTRY32);
@@ -64,17 +64,17 @@ public:
 
 	// Read process memory
 	template <typename T>
-	constexpr T Read(std::uintptr_t address) const noexcept
+	constexpr const T& Read(const std::uintptr_t& address) const noexcept
 	{
-		T value{ };
-		::ReadProcessMemory(processHandle, reinterpret_cast<LPCVOID>(address), &value, sizeof(T), NULL);
+		T value = { };
+		::ReadProcessMemory(processHandle, reinterpret_cast<const void*>(address), &value, sizeof(T), NULL);
 		return value;
 	}
 
 	// Write process memory
 	template <typename T>
-	constexpr const bool Write(std::uintptr_t address, T value) const noexcept
+	constexpr void Write(const std::uintptr_t& address, const T& value) const noexcept
 	{
-		return ::WriteProcessMemory(processHandle, reinterpret_cast<LPVOID>(address), &value, sizeof(T), NULL);
+		::WriteProcessMemory(processHandle, reinterpret_cast<void*>(address), &value, sizeof(T), NULL);
 	}
 };
