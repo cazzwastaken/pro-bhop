@@ -36,7 +36,13 @@ int main()
 
 	while (true)
 	{
+		// we don't need this running a billion times per second :)
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
 		const auto localPlayer = mem.Read<std::uintptr_t>(client + offsets::localPlayer);
+
+		if (!localPlayer)
+			continue;
 
 		const auto localPlayerTeam = mem.Read<std::uintptr_t>(localPlayer + offsets::teamNum);
 		const auto localPlayerFlags = mem.Read<std::uintptr_t>(localPlayer + offsets::flags);
@@ -50,9 +56,12 @@ int main()
 		// glow
 		const auto glowObjectManager = mem.Read<std::uintptr_t>(client + offsets::glowObjectManager);
 
-		for (auto i = 1; i <= 64; ++i)
+		for (auto i = 1; i <= 32; ++i)
 		{
 			const auto entity = mem.Read<std::uintptr_t>(client + offsets::entityList + i * 0x10);
+
+			if (!entity)
+				continue;
 
 			// dont glow if they are on our team
 			if (mem.Read<std::uintptr_t>(entity + offsets::teamNum) == localPlayerTeam)
@@ -60,6 +69,7 @@ int main()
 
 			const auto glowIndex = mem.Read<std::int32_t>(entity + offsets::glowIndex);
 
+			// do glow by writing each variable
 			//mem.Write<float>(glowObjectManager + (glowIndex * 0x38) + 0x8, 1.f);
 			//mem.Write<float>(glowObjectManager + (glowIndex * 0x38) + 0xC, 0.f);
 			//mem.Write<float>(glowObjectManager + (glowIndex * 0x38) + 0x10, 0.f);
@@ -68,12 +78,12 @@ int main()
 			//mem.Write<bool>(glowObjectManager + (glowIndex * 0x38) + 0x28, true);
 			//mem.Write<bool>(glowObjectManager + (glowIndex * 0x38) + 0x29, true);
 
+			// preferred
+			// use a color struct to make 1 WPM call
 			mem.Write<Color>(glowObjectManager + (glowIndex * 0x38) + 0x8, color);
 
 			mem.Write<bool>(glowObjectManager + (glowIndex * 0x38) + 0x28, true);
 			mem.Write<bool>(glowObjectManager + (glowIndex * 0x38) + 0x29, false);
 		}
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 }
